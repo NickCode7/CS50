@@ -2,6 +2,7 @@
 Tic Tac Toe Player
 """
 
+import copy
 import math
 
 X = "X"
@@ -53,3 +54,19 @@ def actions(board):
                 possible_actions.add((i, j))
 
     return possible_actions
+
+
+def result(board, action):
+    """
+    Returns the board that results from making move (i, j) on the board.
+    """
+    i, j = action
+
+    # The move must be on the board and on an empty square
+    if action not in actions(board):
+        raise ValueError(f"Invalid action: {action}")
+
+    # Make a full copy so the original board is not changed
+    new_board = copy.deepcopy(board)
+    new_board[i][j] = player(board)
+    return new_board
