@@ -37,3 +37,19 @@ def player(board):
     if x_count == o_count:
         return X
     return O
+
+
+def actions(board):
+    """
+    Returns set of all possible actions (i, j) available on the board.
+    """
+    possible_actions = set()
+
+    # i is the row number, j is the column number (both 0, 1 or 2)
+    for i in range(3):
+        for j in range(3):
+            # A move is possible anywhere the square is still empty
+            if board[i][j] == EMPTY:
+                possible_actions.add((i, j))
+
+    return possible_actions
