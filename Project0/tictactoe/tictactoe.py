@@ -96,3 +96,93 @@ def winner(board):
 
     # Nobody has three in a row
     return None
+
+
+def terminal(board):
+    """
+    Returns True if game is over, False otherwise.
+    """
+    # Someone has won
+    if winner(board) is not None:
+        return True
+
+    # Still an empty square somewhere -> the game goes on
+    for row in board:
+        for cell in row:
+            if cell == EMPTY:
+                return False
+
+    # No winner and no empty squares -> it's a tie
+    return True
+
+
+def utility(board):
+    """
+    Returns 1 if X has won the game, -1 if O has won, 0 otherwise.
+    """
+    win = winner(board)
+    if win == X:
+        return 1
+    elif win == O:
+        return -1
+    else:
+        return 0
+
+
+def minimax(board):
+    """
+    Returns the optimal action for the current player on the board.
+    """
+    if terminal(board):
+        return None
+
+    best_action = None
+
+    if player(board) == X:
+        # X wants the highest score, so start below any real score
+        best_score = -math.inf
+        for action in actions(board):
+            score = min_value(result(board, action))
+            if score > best_score:
+                best_score = score
+                best_action = action
+    else:
+        # O wants the lowest score, so start above any real score
+        best_score = math.inf
+        for action in actions(board):
+            score = max_value(result(board, action))
+            if score < best_score:
+                best_score = score
+                best_action = action
+
+    return best_action
+
+
+def max_value(board):
+    """
+    Returns the best score X can get from this board,
+    assuming O also plays perfectly.
+    """
+    if terminal(board):
+        return utility(board)
+
+    best_score = -math.inf
+    for action in actions(board):
+        # After X moves it is O's turn, and O picks the lowest score
+        best_score = max(best_score, min_value(result(board, action)))
+    return best_score
+
+
+def min_value(board):
+    """
+    Returns the best score O can get from this board,
+    assuming X also plays perfectly.
+    """
+    if terminal(board):
+        return utility(board)
+
+    best_score = math.inf
+    for action in actions(board):
+        # After O moves it is X's turn, and X picks the highest score
+        best_score = min(best_score, max_value(result(board, action)))
+    return best_score
