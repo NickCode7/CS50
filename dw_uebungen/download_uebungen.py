@@ -168,6 +168,18 @@ def save_exercise(context, url, folder, make_pdf=True):
     return title
 
 
+def launch_browser(p, headless):
+    """Use Playwright's Chromium, or fall back to an installed Chrome/Edge."""
+    errors = []
+    for channel in (None, "chrome", "msedge"):
+        try:
+            return p.chromium.launch(headless=headless, channel=channel)
+        except Exception as e:
+            errors.append(f"{channel or 'playwright chromium'}: {str(e).splitlines()[0]}")
+    sys.exit("No browser found. Install Google Chrome, or run: python -m playwright install chromium\n"
+             + "\n".join(errors))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("url", nargs="?", default=DEFAULT_URL, help="any lesson or exercise URL of the lesson")
@@ -184,7 +196,7 @@ def main():
 
     with sync_playwright() as p:
         # PDF export only works headless; --show is for watching/debugging.
-        browser = p.chromium.launch(headless=not args.show)
+        browser = launch_browser(p, headless=not args.show)
         context = browser.new_context(locale="de-DE", viewport={"width": 1280, "height": 900})
         page = context.new_page()
 
